@@ -1,20 +1,22 @@
 package main
 
 import (
+	"sync"
 	"testing"
 )
 
-func TestUpdatesUserBalanceWithNaiveApproach(t *testing.T) {
+func TestUpdatesUserBalanceWithLockApproach(t *testing.T) {
 	db, err := connectDatabase()
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	userNaiveUpdate := &UserNaiveUpdate{}
+	userUpdate := &UserLockUpdate{}
 
 	t.Run("updates balance given optimistic", func(t *testing.T) {
 		// Arrange
+		var l sync.Mutex
 		truncateTable(t, db)
 
 		userId := 999
@@ -27,7 +29,7 @@ func TestUpdatesUserBalanceWithNaiveApproach(t *testing.T) {
 		// Act
 		c := make(chan any)
 		doAsync(c, 10, func() {
-			err = userNaiveUpdate.update(db, userId, delta)
+			err = userUpdate.update(&l, db, userId, delta)
 			verifyError(t, err)
 		})
 		awaitChannel(c, 10)

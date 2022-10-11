@@ -22,7 +22,7 @@ func awaitChannel(channel chan any, times int) {
 
 func verifyError(t *testing.T, err error) {
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
 }
 
@@ -43,6 +43,7 @@ func insertUser(t *testing.T, db *sql.DB, userId, balance int) {
 }
 
 func assertUserBalance(t *testing.T, db *sql.DB, userId, expectedBalance int) {
+	t.Helper()
 	row := db.QueryRow("SELECT balance FROM balance WHERE user_id = $1", userId)
 
 	var balance int

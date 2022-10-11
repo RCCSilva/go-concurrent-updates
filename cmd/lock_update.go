@@ -2,19 +2,21 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
+	"sync"
 )
 
-type UserNaiveUpdate struct{}
+type UserLockUpdate struct{}
 
-func (UserNaiveUpdate *UserNaiveUpdate) update(db *sql.DB, userId, delta int) error {
+func (UserNaiveUpdate *UserLockUpdate) update(l sync.Locker, db *sql.DB, userId, delta int) error {
+	l.Lock()
+	defer l.Unlock()
+
 	row := db.QueryRow("SELECT balance FROM balance WHERE user_id = $1", userId)
 
 	var balance int
 	err := row.Scan(&balance)
 
 	if err != nil {
-		fmt.Println("---FAILED---")
 		return err
 	}
 
