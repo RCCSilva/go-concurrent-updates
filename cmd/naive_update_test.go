@@ -11,7 +11,7 @@ func TestUpdatesWithNaiveApproach(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	userNaiveUpdate := &NaiveUpdate{}
+	userNaiveUpdate := &NaiveUpdate{db: db}
 
 	t.Run("updates balance given optimistic - EXPECTED TO FAIL", func(t *testing.T) {
 		// Arrange
@@ -27,7 +27,7 @@ func TestUpdatesWithNaiveApproach(t *testing.T) {
 		// Act
 		c := make(chan any)
 		doAsync(c, 10, func() {
-			err = userNaiveUpdate.update(db, userId, delta)
+			err = userNaiveUpdate.update(userId, delta)
 			verifyError(t, err)
 		})
 		awaitChannel(c, 10)

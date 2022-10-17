@@ -4,3 +4,11 @@ Code based on [this](https://github.com/rafaelpontezup/preventing-lost-update-ra
 
 ## Postgres Transaction
 
+
+## Commands
+
+- Execute individual tests
+
+```bash
+go test ./cmd -run TestUpdatesWithLock
+```

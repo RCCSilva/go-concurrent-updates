@@ -11,7 +11,7 @@ func TestUpdatesWithSerializableTransactionLevel(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	userUpdate := &SerializableUpdate{}
+	userUpdate := &SerializableUpdate{db: db}
 
 	// Arrange
 	truncateTable(t, db)
@@ -26,7 +26,7 @@ func TestUpdatesWithSerializableTransactionLevel(t *testing.T) {
 	// Act
 	c := make(chan any)
 	doAsync(c, 10, func() {
-		err = userUpdate.update(db, userId, delta)
+		err = userUpdate.update(userId, delta)
 		verifyError(t, err)
 	})
 	awaitChannel(c, 10)

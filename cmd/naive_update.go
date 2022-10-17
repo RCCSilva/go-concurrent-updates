@@ -5,10 +5,12 @@ import (
 	"fmt"
 )
 
-type NaiveUpdate struct{}
+type NaiveUpdate struct {
+	db *sql.DB
+}
 
-func (UserNaiveUpdate *NaiveUpdate) update(db *sql.DB, userId, delta int) error {
-	row := db.QueryRow("SELECT balance FROM balance WHERE user_id = $1", userId)
+func (n *NaiveUpdate) update(userId, delta int) error {
+	row := n.db.QueryRow("SELECT balance FROM balance WHERE user_id = $1", userId)
 
 	var balance int
 	err := row.Scan(&balance)
@@ -24,7 +26,7 @@ func (UserNaiveUpdate *NaiveUpdate) update(db *sql.DB, userId, delta int) error 
 		return nil
 	}
 
-	_, err = db.Exec("UPDATE balance SET balance = $1 WHERE user_id = $2", newBalance, userId)
+	_, err = n.db.Exec("UPDATE balance SET balance = $1 WHERE user_id = $2", newBalance, userId)
 
 	if err != nil {
 		return err

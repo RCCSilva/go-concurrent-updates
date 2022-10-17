@@ -7,11 +7,13 @@ import (
 	"github.com/avast/retry-go/v4"
 )
 
-type SerializableUpdate struct{}
+type SerializableUpdate struct {
+	db *sql.DB
+}
 
-func (u *SerializableUpdate) update(db *sql.DB, userId, delta int) error {
+func (s *SerializableUpdate) update(userId, delta int) error {
 	return retry.Do(func() error {
-		tx, err := db.BeginTx(
+		tx, err := s.db.BeginTx(
 			context.TODO(),
 			&sql.TxOptions{Isolation: sql.LevelSerializable},
 		)

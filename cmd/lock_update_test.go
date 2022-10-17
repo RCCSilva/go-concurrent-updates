@@ -11,12 +11,10 @@ func TestUpdatesWithLock(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	userUpdate := &LockWithMutexUpdate{}
+	userUpdate := &LockWithMutexUpdate{db: db, locker: &sync.Mutex{}}
 
 	t.Run("updates balance given lock using Mutex", func(t *testing.T) {
 		// Arrange
-		var l sync.Mutex
 		truncateTable(t, db)
 
 		userId := 999
@@ -29,7 +27,7 @@ func TestUpdatesWithLock(t *testing.T) {
 		// Act
 		c := make(chan any)
 		doAsync(c, 10, func() {
-			err = userUpdate.update(&l, db, userId, delta)
+			err = userUpdate.update(userId, delta)
 			verifyError(t, err)
 		})
 		awaitChannel(c, 10)

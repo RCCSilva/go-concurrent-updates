@@ -5,13 +5,16 @@ import (
 	"sync"
 )
 
-type LockWithMutexUpdate struct{}
+type LockWithMutexUpdate struct {
+	locker sync.Locker
+	db     *sql.DB
+}
 
-func (UserNaiveUpdate *LockWithMutexUpdate) update(l sync.Locker, db *sql.DB, userId, delta int) error {
-	l.Lock()
-	defer l.Unlock()
+func (l *LockWithMutexUpdate) update(userId, delta int) error {
+	l.locker.Lock()
+	defer l.locker.Unlock()
 
-	row := db.QueryRow("SELECT balance FROM balance WHERE user_id = $1", userId)
+	row := l.db.QueryRow("SELECT balance FROM balance WHERE user_id = $1", userId)
 
 	var balance int
 	err := row.Scan(&balance)
@@ -26,7 +29,7 @@ func (UserNaiveUpdate *LockWithMutexUpdate) update(l sync.Locker, db *sql.DB, us
 		return nil
 	}
 
-	_, err = db.Exec("UPDATE balance SET balance = $1 WHERE user_id = $2", newBalance, userId)
+	_, err = l.db.Exec("UPDATE balance SET balance = $1 WHERE user_id = $2", newBalance, userId)
 
 	if err != nil {
 		return err
