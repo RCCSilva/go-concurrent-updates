@@ -5,16 +5,16 @@ import (
 	"testing"
 )
 
-func TestUpdatesUserBalanceWithLockApproach(t *testing.T) {
+func TestUpdatesWithLock(t *testing.T) {
 	db, err := connectDatabase()
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	userUpdate := &UserLockUpdate{}
+	userUpdate := &LockWithMutexUpdate{}
 
-	t.Run("updates balance given optimistic", func(t *testing.T) {
+	t.Run("updates balance given lock using Mutex", func(t *testing.T) {
 		// Arrange
 		var l sync.Mutex
 		truncateTable(t, db)

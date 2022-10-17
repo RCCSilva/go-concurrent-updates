@@ -5,9 +5,9 @@ import (
 	"sync"
 )
 
-type UserLockUpdate struct{}
+type LockWithMutexUpdate struct{}
 
-func (UserNaiveUpdate *UserLockUpdate) update(l sync.Locker, db *sql.DB, userId, delta int) error {
+func (UserNaiveUpdate *LockWithMutexUpdate) update(l sync.Locker, db *sql.DB, userId, delta int) error {
 	l.Lock()
 	defer l.Unlock()
 

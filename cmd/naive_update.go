@@ -5,9 +5,9 @@ import (
 	"fmt"
 )
 
-type UserNaiveUpdate struct{}
+type NaiveUpdate struct{}
 
-func (UserNaiveUpdate *UserNaiveUpdate) update(db *sql.DB, userId, delta int) error {
+func (UserNaiveUpdate *NaiveUpdate) update(db *sql.DB, userId, delta int) error {
 	row := db.QueryRow("SELECT balance FROM balance WHERE user_id = $1", userId)
 
 	var balance int

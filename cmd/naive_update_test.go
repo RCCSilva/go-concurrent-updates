@@ -4,16 +4,16 @@ import (
 	"testing"
 )
 
-func TestUpdatesUserBalanceWithNaiveApproach(t *testing.T) {
+func TestUpdatesWithNaiveApproach(t *testing.T) {
 	db, err := connectDatabase()
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	userNaiveUpdate := &UserNaiveUpdate{}
+	userNaiveUpdate := &NaiveUpdate{}
 
-	t.Run("updates balance given optimistic", func(t *testing.T) {
+	t.Run("updates balance given optimistic - EXPECTED TO FAIL", func(t *testing.T) {
 		// Arrange
 		truncateTable(t, db)
 
