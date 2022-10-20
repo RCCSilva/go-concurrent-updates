@@ -6,7 +6,7 @@ import (
 )
 
 func doAsync(channel chan any, times int, function func()) {
-	for i := 0; i < 10; i++ {
+	for i := 0; i < times; i++ {
 		go func() {
 			function()
 			channel <- nil
