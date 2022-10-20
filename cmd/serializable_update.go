@@ -3,46 +3,51 @@ package main
 import (
 	"context"
 	"database/sql"
-
-	"github.com/avast/retry-go/v4"
+	"rccsilva/go-concurrent-updates/cmd/retry"
+	"time"
 )
 
 type SerializableUpdate struct {
 	db *sql.DB
 }
 
-func (s *SerializableUpdate) update(userId, delta int) error {
-	return retry.Do(func() error {
-		tx, err := s.db.BeginTx(
-			context.TODO(),
-			&sql.TxOptions{Isolation: sql.LevelSerializable},
-		)
-		defer tx.Rollback()
-		if err != nil {
-			return err
-		}
+func (s *SerializableUpdate) update(ctx context.Context, userId, delta int) error {
+	return retry.Retry(
+		ctx,
+		3,
+		100*time.Millisecond,
+		func() error {
+			tx, err := s.db.BeginTx(
+				context.TODO(),
+				&sql.TxOptions{Isolation: sql.LevelSerializable},
+			)
+			defer tx.Rollback()
+			if err != nil {
+				return err
+			}
 
-		row := tx.QueryRow("SELECT balance FROM balance WHERE user_id = $1", userId)
+			row := tx.QueryRow("SELECT balance FROM balance WHERE user_id = $1", userId)
 
-		var balance int
-		err = row.Scan(&balance)
+			var balance int
+			err = row.Scan(&balance)
 
-		if err != nil {
-			return err
-		}
+			if err != nil {
+				return err
+			}
 
-		newBalance := balance + delta
+			newBalance := balance + delta
 
-		if newBalance < 0 {
-			return nil
-		}
+			if newBalance < 0 {
+				return nil
+			}
 
-		_, err = tx.Exec("UPDATE balance SET balance = $1 WHERE user_id = $2", newBalance, userId)
+			_, err = tx.Exec("UPDATE balance SET balance = $1 WHERE user_id = $2", newBalance, userId)
 
-		if err != nil {
-			return err
-		}
+			if err != nil {
+				return err
+			}
 
-		return tx.Commit()
-	}, retry.DelayType(retry.BackOffDelay))
+			return tx.Commit()
+		},
+	)
 }

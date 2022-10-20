@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"testing"
+	"time"
 )
 
 func TestUpdatesWithSerializableTransactionLevel(t *testing.T) {
@@ -26,7 +28,9 @@ func TestUpdatesWithSerializableTransactionLevel(t *testing.T) {
 	// Act
 	c := make(chan any)
 	doAsync(c, 10, func() {
-		err = userUpdate.update(userId, delta)
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer cancel()
+		err = userUpdate.update(ctx, userId, delta)
 		verifyError(t, err)
 	})
 	awaitChannel(c, 10)

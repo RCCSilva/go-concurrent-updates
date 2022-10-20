@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-
-	"github.com/avast/retry-go/v4"
+	"rccsilva/go-concurrent-updates/cmd/retry"
+	"time"
 )
 
 type PostgresLock struct {
@@ -26,7 +26,10 @@ func (p *PostgresLock) TryWithPgLock(
 }
 
 func (p *PostgresLock) acquireLock(ctx context.Context, tx *sql.Tx, key int) error {
-	return retry.Do(
+	return retry.Retry(
+		ctx,
+		10,
+		100*time.Millisecond,
 		func() error {
 			row := tx.QueryRow("select pg_try_advisory_xact_lock($1)", key)
 			var result bool
@@ -41,6 +44,5 @@ func (p *PostgresLock) acquireLock(ctx context.Context, tx *sql.Tx, key int) err
 			}
 			return nil
 		},
-		retry.Context(ctx),
 	)
 }
