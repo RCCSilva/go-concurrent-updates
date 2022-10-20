@@ -4,6 +4,12 @@ Code based on [Rafael Ponte's repository](https://github.com/rafaelpontezup/prev
 
 ## Commands
 
+- Execute all tests
+
+```bash
+go test ./cmd
+```
+
 - Execute individual tests
 
 ```bash
