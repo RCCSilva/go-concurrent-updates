@@ -18,7 +18,7 @@ func Retry(
 	for i := 0; i < attempts; i++ {
 		if i > 0 {
 			time.Sleep(sleep)
-			sleep = min(sleep*2+(time.Duration(rand.Intn(10))*time.Millisecond), max)
+			sleep = min(sleep*2+(time.Duration(rand.Intn(1000))*time.Millisecond), max)
 		}
 
 		err = f()
