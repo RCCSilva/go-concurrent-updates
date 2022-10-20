@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"rccsilva/go-concurrent-updates/pglock"
 	"testing"
 	"time"
 )
@@ -15,7 +16,7 @@ func TestUpdatesWithPostgresAdvisoryLock(t *testing.T) {
 
 	userUpdate := &PostgresAdvisoryUpdate{
 		db:     db,
-		pgLock: &PostgresLock{db: db},
+		pgLock: &pglock.PostgresLock{},
 	}
 
 	// Arrange

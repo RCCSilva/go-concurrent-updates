@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 )
 
 type NaiveUpdate struct {
@@ -16,7 +15,6 @@ func (n *NaiveUpdate) update(userId, delta int) error {
 	err := row.Scan(&balance)
 
 	if err != nil {
-		fmt.Println("---FAILED---")
 		return err
 	}
 
